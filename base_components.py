@@ -22,7 +22,7 @@ system_message = ("This is an agent based model. "
 def select_action(llm, name, personality, memory, situation, system_message=system_message):
     """Select an action for an agent based on their personality and memory."""
     request = (
-        "You need to decide what to do. Pretend that you are {name} and in this situation. "
+        f"You need to decide what to do. Pretend that you are {name} and in this situation. "
         f"Given this personality profile: {personality} for {name}, and the current situation: {situation}, "
         f"List 5 actions that you can take in this situation."
         f"You have these memories to help you make a decision: {memory}. "
@@ -51,8 +51,8 @@ def get_outcomes(llm, actions, personalities, memories, situation):
 def multiple_choice(llm, options, name, personality, memory, situation, system_message=system_message):
     """Select an action for an agent based on their personality and memory."""
     system_message = (
-        "You are playing a character named {name}. /n"
-        "Pretend that you are {name} and answer the question as if you were them. /n"
+        f"You are playing a character named {name}. /n"
+        f"Pretend that you are {name} and answer the question as if you were them. /n"
         "This is in the context of a role playing game. /n"
         "You must select the best option for the situation. /n"
         "You must only provide the letter that corresponds to the option that you want to select. /n"
