@@ -22,9 +22,13 @@ system_message = ("This is an agent based model. "
 def select_action(llm, name, personality, memory, situation, system_message=system_message):
     """Select an action for an agent based on their personality and memory."""
     request = (
+        "You need to decide what to do. Pretend that you are {name} and in this situation. "
         f"Given this personality profile: {personality} for {name}, and the current situation: {situation}, "
-        f"what should you do? You have these memories to help you make a decision: {memory}. "
-        f"Pretend that you are {name} and in this situation. Provide a single line answer describing the action.")
+        f"List 5 actions that you can take in this situation."
+        f"You have these memories to help you make a decision: {memory}. "
+        f"one you have listed the actions, you will need to select one of them to take."
+        f"provide that one action in your response, and have it be less than 100 characters."
+    )
     prompt = prompt_template.substitute(system_prompt=system_message, request=request)
     return llm(prompt, stop=['<|eot_id|>'])
 
