@@ -19,8 +19,8 @@ Answer:[/INST]"""
 
 system_message = (
     "This is an agent based model. "
-    f"The goal of the LLM to to play the characters. "
-    f"Their behaviours should reflect who they are in the situations that they are in"
+    "The goal of the LLM to to play characters in a game, and act as humanlike as possible. "
+    "Ideally, human observers should not be able to tell the difference between the LLM and a human player. "
 )
 
 
@@ -83,9 +83,11 @@ def multiple_choice(
 ):
     """Select an action for an agent based on their personality and memory."""
     system_message = (
+        "This is an agent based model. /n"
+        "The goal of the LLM to to play characters in a game, and act as humanlike as possible. /n"
+        "Ideally, human observers should not be able to tell the difference between the LLM and a human player. /n"
         f"You are playing a character named {name}. /n"
         f"Pretend that you are {name} and answer the question as if you were them. /n"
-        "This is in the context of a role playing game. /n"
         "You must select the best option for the situation. /n"
         "You must only provide the letter that corresponds to the option that you want to select. /n"
     )
