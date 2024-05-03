@@ -51,6 +51,7 @@ def plot_curve(
   plt.plot(expected_values, attitudes, 'yo')
   plt.xlabel("Expected Value")
   plt.ylabel("Affective Value")
+  plt.ylim(-1., 1)
   plt.title(title)
   plt.show()
 
