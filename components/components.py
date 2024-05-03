@@ -7,7 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import re
 
-from ollama_model import OllamaLanguageModel
+from language_models.ollama_model import OllamaLanguageModel
 from retry import retry
 
 
