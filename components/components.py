@@ -78,7 +78,7 @@ def get_outcomes(
     }
     return outcomes
 
-
+@retry(AttributeError, tries = 5)
 def multiple_choice(
     model: OllamaLanguageModel,
     options,
@@ -97,6 +97,11 @@ def multiple_choice(
         f"provide only the letter that corresponds to the option that you want to select."
     )
     output = model.sample_text(request)
+    try:
+        output = re.search(r'\(?(\w)(?=\))', output).group(1)
+    except ValueError as e:
+        print("No match found", e)
+
     return output
 
 
@@ -236,7 +241,7 @@ def multiple_choice_preferences(
     return output
 
 
-def summerize_string(model: OllamaLanguageModel, object: str):
+def summarize_string(model: OllamaLanguageModel, object: str):
     """compute value."""
     request = (
         f"Summarize the following text: {object}. "
