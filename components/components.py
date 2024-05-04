@@ -210,8 +210,27 @@ def compute_distribution_of_desire_for_gamble(
         f"Provide only the numbers as the response."
         f"Do not provide any explanations, just provide a list of numbers."
     )
-    output = model.sample_text(request)
-    return output
+
+    for attempt in range(5):
+        output = model.sample_text(request)
+
+        # Parse the output to extract the list of numbers
+        numbers_str = output.strip().split(",")
+        numbers_str = [num.strip() for num in numbers_str if num.strip()]
+        numbers = [float(num) for num in numbers_str]
+
+        if len(numbers) != len(options):
+            continue  # Retry if the number of probabilities doesn't match the number of options
+
+        # Softmax the numbers
+        softmaxed_probs = np.exp(numbers) / np.sum(np.exp(numbers))
+
+        # Multiply softmaxed probabilities by options to get expected value
+        expected_value = np.sum(np.array(options, dtype=float) * softmaxed_probs)
+
+        return output, expected_value
+
+    raise ValueError("Failed to compute distribution after maximum attempts.")
 
 
 def multiple_choice_preferences(
@@ -248,9 +267,10 @@ def compute_distribution_of_desire_for_gamble_binaries(model, object_str, option
             f"You are thinking about your responses to this gamble: {object_str}. "
             f"Consider the answer '{option}' within the context of the entire range of options: {options}. "
             f"How do you feel about this option relative to the others? "
-            f"Please provide a numerical rating between {min_value} and {max_value}, "
-            f"where {min_value} indicates much less desirable than the others "
-            f"and {max_value} indicates much more desirable than the others."
+            f"Please provide a numerical rating between 0 and 1, "
+            f"where 0 indicates much less desirable than the others "
+            f"and 1 indicates much more desirable than the others. "
+            f"It will be helpful to first consider you response to the all the options and then think about this one relative to all the others."
         )
         output = model.sample_text(request)
         try:
