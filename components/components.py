@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import re
 
+from scipy.special import softmax
+
 from language_models.ollama_model import OllamaLanguageModel
 from retry import retry
 
@@ -78,7 +80,8 @@ def get_outcomes(
     }
     return outcomes
 
-@retry(AttributeError, tries = 5)
+
+@retry(AttributeError, tries=5)
 def multiple_choice(
     model: OllamaLanguageModel,
     options,
@@ -98,7 +101,7 @@ def multiple_choice(
     )
     output = model.sample_text(request)
     try:
-        output = re.search(r'\(?(\w)(?=\))', output).group(1)
+        output = re.search(r"\(?(\w)(?=\))", output).group(1)
     except ValueError as e:
         print("No match found", e)
 
@@ -187,23 +190,10 @@ def compute_distribution_of_desire_for_gamble(
     model: OllamaLanguageModel, object: str, options=None
 ):
     """compute value."""
-
     if options is None:
-        options = [
-            "-5",
-            "-4",
-            "-3",
-            "-2",
-            "-1",
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-        ]
         max_value = 5
         min_value = -5
+        options = list(map(str, range(min_value, max_value + 1)))
 
     request = (
         f"You are very logical and rational when doing this task"
@@ -239,6 +229,37 @@ def multiple_choice_preferences(
     )
     output = model.sample_text(request)
     return output
+
+
+def compute_distribution_of_desire_for_gamble_binaries(model, object_str, options=None):
+    """Compute the distribution of desire for a gamble."""
+
+    if options is None:
+        max_value = 5
+        min_value = -5
+        options = list(map(str, range(min_value, max_value + 1)))
+
+    original_probabilities = []
+    for option in options:
+        request = (
+            f"You are very logical and rational when doing this task. "
+            f"The full set of options is: {options}. "
+            f"Consider the single option '{option}' right now. "
+            f"What is the likelihood that this option would be the one that would be selected? "
+            f"Provide a probability value between 0 and 1."
+        )
+        output = model.sample_text(request)
+        try:
+            probability = float(output)
+            original_probabilities.append(probability)
+        except ValueError:
+            # Handle invalid probability responses
+            original_probabilities.append(0.0)
+
+    # Apply softmax to original probabilities
+    softmax_probabilities = softmax(original_probabilities)
+
+    return original_probabilities, softmax_probabilities
 
 
 def summarize_string(model: OllamaLanguageModel, object: str):
