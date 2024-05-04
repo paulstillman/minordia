@@ -238,22 +238,28 @@ def compute_distribution_of_desire_for_gamble_binaries(model, object_str, option
         max_value = 5
         min_value = -5
         options = list(map(str, range(min_value, max_value + 1)))
+    else:
+        options = [str(option) for option in options]  # Convert options to strings
 
     original_probabilities = []
     for option in options:
         request = (
             f"You are very logical and rational when doing this task. "
-            f"The full set of options is: {options}. "
-            f"Consider the single option '{option}' right now. "
-            f"What is the likelihood that this option would be the one that would be selected? "
-            f"Provide a probability value between 0 and 1."
+            f"You are thinking about your responses to this gamble: {object_str}. "
+            f"Consider the answer '{option}' within the context of the entire range of options: {options}. "
+            f"How do you feel about this option relative to the others? "
+            f"Please provide a numerical rating between {min_value} and {max_value}, "
+            f"where {min_value} indicates much less desirable than the others "
+            f"and {max_value} indicates much more desirable than the others."
         )
         output = model.sample_text(request)
         try:
-            probability = float(output)
-            original_probabilities.append(probability)
+            rating = float(output)
+            # Normalize the rating to be between 0 and 1
+            normalized_rating = (rating - min_value) / (max_value - min_value)
+            original_probabilities.append(normalized_rating)
         except ValueError:
-            # Handle invalid probability responses
+            # Handle invalid rating responses
             original_probabilities.append(0.0)
 
     # Apply softmax to original probabilities
