@@ -243,7 +243,6 @@ def summerize_string(model: OllamaLanguageModel, object: str):
         f"Provide a summary that is less than 1000 characters. "
         f"Make sure that the summary is coherent and captures the main points of the text. "
         f"Do not include any information that is not present in the text. "
-        f"If possible, try to use only 3 or 4 sentences and if appropriate strategies for future actions."
     )
 
     output = model.sample_text(request)
