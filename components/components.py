@@ -185,11 +185,6 @@ def compute_distribution_of_desire_for_gamble(
 
     if options is None:
         options = [
-            "-10",
-            "-9",
-            "-8",
-            "-7",
-            "-6",
             "-5",
             "-4",
             "-3",
@@ -201,14 +196,9 @@ def compute_distribution_of_desire_for_gamble(
             "3",
             "4",
             "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
         ]
-        max_value = 10
-        min_value = -10
+        max_value = 5
+        min_value = -5
 
     request = (
         f"You are very logical and rational when doing this task"
@@ -221,6 +211,9 @@ def compute_distribution_of_desire_for_gamble(
         f"The option is: {object}"
         f"Provode the probability of each option being selected. "
         f"In other words, provide a probability for each of the {options}"
+        f"Provide these probabilities in the form of a list of numbers that sum to 1. "
+        f"Provide only the numbers as the response."
+        f"Do not provide any explanations, just provide a list of numbers."
     )
     output = model.sample_text(request)
     return output
@@ -237,6 +230,7 @@ def multiple_choice_preferences(
         f"Given this gamble: {gamble}, and this affetive feeling about the gamble: {affective_feeling}, "
         f"Which {options} best characterizes the likelihood that you would take this this gamble? "
         f"Provide only the option that corresponds to your likelihood to take the gamble."
+        f"Do not provide any explanations, just provide a single word."
     )
     output = model.sample_text(request)
     return output
