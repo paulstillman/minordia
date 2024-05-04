@@ -19,7 +19,12 @@ system_message = (
 
 
 def select_action(
-    model: OllamaLanguageModel, name, personality, memory, situation, system_message=system_message
+    model: OllamaLanguageModel,
+    name,
+    personality,
+    memory,
+    situation,
+    system_message=system_message,
 ):
     """Select an action for an agent based on their personality and memory."""
     request = (
@@ -35,7 +40,12 @@ def select_action(
 
 
 def determine_behaviours(
-    model: OllamaLanguageModel, name, personality, memory, situation, system_message=system_message
+    model: OllamaLanguageModel,
+    name,
+    personality,
+    memory,
+    situation,
+    system_message=system_message,
 ):
     """Select a set of appropriate behaviours for an agent based on their personality and memory."""
     request = (
@@ -50,7 +60,9 @@ def determine_behaviours(
     return output
 
 
-def get_outcomes(model: OllamaLanguageModel, actions, personalities, memories, situation):
+def get_outcomes(
+    model: OllamaLanguageModel, actions, personalities, memories, situation
+):
     """Determines the outcomes of actions using the LLM."""
     outcome_prompts = {}
     for name, action in actions.items():
@@ -62,14 +74,19 @@ def get_outcomes(model: OllamaLanguageModel, actions, personalities, memories, s
         )
 
     outcomes = {
-        name: model.sample_text(request)
-        for name, prompt in outcome_prompts.items()
+        name: model.sample_text(request) for name, prompt in outcome_prompts.items()
     }
     return outcomes
 
 
 def multiple_choice(
-    model: OllamaLanguageModel, options, name, personality, memory, situation, system_message=system_message
+    model: OllamaLanguageModel,
+    options,
+    name,
+    personality,
+    memory,
+    situation,
+    system_message=system_message,
 ):
     """Select an action for an agent based on their personality and memory."""
     request = (
@@ -84,10 +101,15 @@ def multiple_choice(
 
 
 def multiple_choice_with_answer(
-    model: OllamaLanguageModel, options, name, personality, memory, situation, system_message=system_message
+    model: OllamaLanguageModel,
+    options,
+    name,
+    personality,
+    memory,
+    situation,
+    system_message=system_message,
 ):
     """Select an action for an agent based on their personality and memory."""
-    )
     request = (
         "This is a multiple choice question. /n"
         f"consider the options: {options} and select the best one for the situation. /n"
@@ -112,7 +134,9 @@ def update_situation(model: OllamaLanguageModel, situation, outcomes):
 
 
 @retry(ValueError, tries=5)
-def mental_deliberation(model: OllamaLanguageModel, name: str, personality, memory, situation):
+def mental_deliberation(
+    model: OllamaLanguageModel, name: str, personality, memory, situation
+):
     """Mental deliberation for an agent based on their personality and memory."""
     request = (
         f"Given this personality profile: {personality} for {name}, and the current situation: {situation}, "
@@ -151,3 +175,33 @@ def compute_desire_for_gamble(model: OllamaLanguageModel, object: str):
 
     output = model.sample_text(request)
     return float(output)
+
+
+def multiple_choice_preferences(
+    model: OllamaLanguageModel, options: None, gamble, affective_feeling
+):
+    """Select an action for an agent based on their personality and memory."""
+    if options is None:
+        options = ["Never", "Rarely", "Sometimes", "Often", "Always"]
+    request = (
+        f"Consider these options: {options} and select the best one for the situation. "
+        f"Given this gamble: {gamble}, and this affetive feeling about the gamble: {affective_feeling}, "
+        f"Which {options} best characterizes the likelihood that you would take this this gamble? "
+        f"Provide only the option that corresponds to your likelihood to take the gamble."
+    )
+    output = model.sample_text(request)
+    return output
+
+
+def summerize_string(model: OllamaLanguageModel, object: str):
+    """compute value."""
+    request = (
+        f"Summarize the following text: {object}. "
+        f"Provide a summary that is less than 1000 characters. "
+        f"Make sure that the summary is coherent and captures the main points of the text. "
+        f"Do not include any information that is not present in the text. "
+        f"If possible, try to use only 3 or 4 sentences and if appropriate strategies for future actions."
+    )
+
+    output = model.sample_text(request)
+    return output
