@@ -98,12 +98,15 @@ def multiple_choice(
         f"Given the situation: {situation}, and the personality: {personality} for {name}, /n"
         f"use the deliberations or memories found in {memory} to help make your decision. /n"
         f"provide only the letter that corresponds to the option that you want to select."
+        f"example: (a)"
     )
     output = model.sample_text(request)
-    try:
-        output = re.search(r"\(?(\w)(?=\))", output).group(1)
-    except ValueError as e:
-        print("No match found", e)
+
+    if len(output) > 1:
+        try:
+            output = re.search(r"\(?(\w)(?=\))", output).group(1)
+        except ValueError as e:
+            print("No match found", e)
 
     return output
 
