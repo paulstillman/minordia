@@ -276,8 +276,47 @@ def compute_distribution_of_desire_for_gamble_binaries(model, object_str, option
         try:
             rating = float(output)
             # Normalize the rating to be between 0 and 1
-            normalized_rating = (rating - min_value) / (max_value - min_value)
-            original_probabilities.append(normalized_rating)
+            # normalized_rating = (rating - min_value) / (max_value - min_value)
+            original_probabilities.append(rating)
+        except ValueError:
+            # Handle invalid rating responses
+            original_probabilities.append(0.0)
+
+    # Apply softmax to original probabilities
+    softmax_probabilities = softmax(original_probabilities)
+
+    return original_probabilities, softmax_probabilities
+
+
+def compute_distribution_of_desire_for_gamble_words(model, object_str, options=None):
+    """Compute the distribution of desire for a gamble."""
+
+    min_value = -10
+    max_value = 10
+
+    if options is None:
+        options = ["Very Bad", "Bad", "Neutral", "Good", "Very Good"]
+    else:
+        options = [str(option) for option in options]  # Convert options to strings
+
+    original_probabilities = []
+    for option in options:
+        request = (
+            f"You are very logical and rational when doing this task. "
+            f"You are thinking about your responses to this gamble: {object_str}. "
+            f"Consider the answer '{option}' within the context of the entire range of options: {options}. "
+            f"How do you feel about this option relative to the others? "
+            f"Please provide a numerical rating between 0 and 1, "
+            f"where 0 indicates much less desirable than the others "
+            f"and 1 indicates much more desirable than the others. "
+            f"It will be helpful to first consider you response to the all the options and then think about this one relative to all the others."
+        )
+        output = model.sample_text(request)
+        try:
+            rating = float(output)
+            # Normalize the rating to be between 0 and 1
+            # normalized_rating = (rating - min_value) / (max_value - min_value)
+            original_probabilities.append(rating)
         except ValueError:
             # Handle invalid rating responses
             original_probabilities.append(0.0)
