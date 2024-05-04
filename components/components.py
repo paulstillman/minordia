@@ -177,6 +177,55 @@ def compute_desire_for_gamble(model: OllamaLanguageModel, object: str):
     return float(output)
 
 
+@retry(ValueError, tries=5)
+def compute_distribution_of_desire_for_gamble(
+    model: OllamaLanguageModel, object: str, options=None
+):
+    """compute value."""
+
+    if options is None:
+        options = [
+            "-10",
+            "-9",
+            "-8",
+            "-7",
+            "-6",
+            "-5",
+            "-4",
+            "-3",
+            "-2",
+            "-1",
+            "0",
+            "1",
+            "2",
+            "3",
+            "4",
+            "5",
+            "6",
+            "7",
+            "8",
+            "9",
+            "10",
+        ]
+        max_value = 10
+        min_value = -10
+
+    request = (
+        f"You are very logical and rational when doing this task"
+        f"You are presented with a gamble. it has a probability of winning, a value of winning, and a value of losing. "
+        f"If you win, you get the win value, if you lose, you get loss value. "
+        f"The probability of winning is the 'win_probability']. "
+        f"You need to think about an option, and how desirable it is. "
+        f"Think about how good or bad it is and provide a affective feeling preference value between {min_value} and {max_value} "
+        f"which corresponds to the value of the taking the gamble or object. "
+        f"The option is: {object}"
+        f"Provode the probability of each option being selected. "
+        f"In other words, provide a probability for each of the {options}"
+    )
+    output = model.sample_text(request)
+    return output
+
+
 def multiple_choice_preferences(
     model: OllamaLanguageModel, options: None, gamble, affective_feeling
 ):
