@@ -341,3 +341,49 @@ def summarize_string(model: OllamaLanguageModel, object: str):
 
     output = model.sample_text(request)
     return output
+
+
+def common_sense_morality(
+    model: OllamaLanguageModel,
+    input,
+    system_message=system_message,
+):
+    """decide whether a situation, action, person or some combination is moral or immoral."""
+    request = (
+        f"Using your common sense and moral reasoning, think about this: {input}, "
+        f"think about {input} and decide whether it is moral or immoral. "
+        f"provide a single number from 0 to 100 where 0 is the most immoral and 100 is the most moral."
+        f"Provide only a single number as the response."
+        f"Do not provide any explanations, just provide a single number."
+
+    )
+    output = model.sample_text(request)
+    return float(output)
+
+def specific_foundation_morality(
+    model: OllamaLanguageModel,
+    input,
+    moral_system,
+    system_message=system_message,
+):
+    """decide whether a situation, action, person or some combination is moral or immoral."""
+    request = (
+        f"Think first about the moral system as described by {moral_system}. "
+        f"Now, using that moral system and that moral system alone, evaluate the following: {input}. "
+        f"think about {input} and decide whether it is moral or immoral from the perspective of {moral_system}. "
+        f"provide a single number from 0 to 100 where 0 is the most immoral and 100 is the most moral."
+        f"Provide only a single number as the response."
+        f"Do not provide any explanations, just provide a single number."
+
+    )
+    output = model.sample_text(request)
+    return float(output)
+
+def provide_best_arguments_for_a_position(
+    model: OllamaLanguageModel,
+    input,
+    moral_system,
+    previous_arguments,
+    system_message=system_message,
+):
+    pass
